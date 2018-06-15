@@ -146,6 +146,36 @@ void PlayAudioEngine::setToneOn(bool isToneOn) {
     mIsToneOn = isToneOn;
 }
 
+void PlayAudioEngine::setChannelOn1(bool isChannelOn) {
+    mIsChannelOn1 = isChannelOn;
+}
+void PlayAudioEngine::setChannelOn2(bool isChannelOn) {
+    mIsChannelOn2 = isChannelOn;
+}
+void PlayAudioEngine::setChannelOn3(bool isChannelOn) {
+    mIsChannelOn3 = isChannelOn;
+}
+void PlayAudioEngine::setChannelOn4(bool isChannelOn) {
+    mIsChannelOn4 = isChannelOn;
+}
+
+void PlayAudioEngine::setChannelOn5(bool isChannelOn) {
+    mIsChannelOn4 = isChannelOn;
+}
+
+void PlayAudioEngine::setChannelOn6(bool isChannelOn) {
+    mIsChannelOn4 = isChannelOn;
+}
+
+void PlayAudioEngine::setChannelOn7(bool isChannelOn) {
+    mIsChannelOn4 = isChannelOn;
+}
+
+void PlayAudioEngine::setChannelOn8(bool isChannelOn) {
+    mIsChannelOn4 = isChannelOn;
+}
+
+
 /**
  * Every time the playback stream requires data this method will be called.
  *
@@ -183,8 +213,55 @@ PlayAudioEngine::onAudioReady(oboe::AudioStream *audioStream, void *audioData, i
     // If the tone is on we need to use our synthesizer to render the audio data for the sine waves
     if (audioStream->getFormat() == oboe::AudioFormat::Float) {
         if (mIsToneOn) {
-            for (int i = 0; i < channelCount; ++i) {
-                mOscillators[i].render(static_cast<float *>(audioData) + i, channelCount, numFrames);
+
+            //If no specific channel is chosen, we play them all
+            if(!mIsChannelOn1 && !mIsChannelOn2 && !mIsChannelOn3 && !mIsChannelOn4 &&
+                    !mIsChannelOn5 && !mIsChannelOn6 && !mIsChannelOn7 && !mIsChannelOn8) {
+                LOGD("No channels on");
+                for (int i = 0; i < channelCount; ++i) {
+                    mOscillators[i].render(static_cast<float *>(audioData) + i, channelCount, numFrames);
+                }
+            } else {
+                //We have some combination of channels to play
+                if(mIsChannelOn1) {
+                    if (channelCount >= 1)
+                        mOscillators[0].render(static_cast<float *>(audioData) + 0, channelCount, numFrames);
+                }
+
+                if(mIsChannelOn2) {
+                    if (channelCount >= 2)
+                        mOscillators[1].render(static_cast<float *>(audioData) + 1, channelCount, numFrames);
+                }
+
+                if(mIsChannelOn3) {
+                    if (channelCount >= 3)
+                        mOscillators[2].render(static_cast<float *>(audioData) + 2, channelCount, numFrames);
+                }
+
+                if(mIsChannelOn4) {
+                    if (channelCount >= 4)
+                        mOscillators[3].render(static_cast<float *>(audioData) + 3, channelCount, numFrames);
+                }
+
+                if(mIsChannelOn5) {
+                    if (channelCount >= 5)
+                        mOscillators[4].render(static_cast<float *>(audioData) + 4, channelCount, numFrames);
+                }
+
+                if(mIsChannelOn6) {
+                    if (channelCount >= 6)
+                        mOscillators[5].render(static_cast<float *>(audioData) + 5, channelCount, numFrames);
+                }
+
+                if(mIsChannelOn7) {
+                    if (channelCount >= 7)
+                        mOscillators[6].render(static_cast<float *>(audioData) + 6, channelCount, numFrames);
+                }
+
+                if(mIsChannelOn8) {
+                    if (channelCount >= 8)
+                        mOscillators[7].render(static_cast<float *>(audioData) + 7, channelCount, numFrames);
+                }
             }
         } else {
             memset(static_cast<uint8_t *>(audioData), 0,
@@ -192,9 +269,55 @@ PlayAudioEngine::onAudioReady(oboe::AudioStream *audioStream, void *audioData, i
         }
     } else {
         if (mIsToneOn) {
-            for (int i = 0; i < channelCount; ++i) {
-                mOscillators[i].render(static_cast<int16_t *>(audioData) + i, channelCount, numFrames);
+            //If no specific channel is chosen, we play them all
+            if(!mIsChannelOn1 && !mIsChannelOn2 && !mIsChannelOn3 && !mIsChannelOn4 &&
+                    !mIsChannelOn5 && !mIsChannelOn6 && !mIsChannelOn7 && !mIsChannelOn8) {
+                for (int i = 0; i < channelCount; ++i) {
+                    mOscillators[i].render(static_cast<int16_t *>(audioData) + i, channelCount, numFrames);
+                }
+            } else {
+                //We have some combination of channels to play
+                if(mIsChannelOn1) {
+                    if (channelCount >= 1)
+                        mOscillators[0].render(static_cast<int16_t *>(audioData) + 0, channelCount, numFrames);
+                }
+
+                if(mIsChannelOn2) {
+                    if (channelCount >= 2)
+                        mOscillators[1].render(static_cast<int16_t *>(audioData) + 1, channelCount, numFrames);
+                }
+
+                if(mIsChannelOn3) {
+                    if (channelCount >= 3)
+                        mOscillators[2].render(static_cast<int16_t *>(audioData) + 2, channelCount, numFrames);
+                }
+
+                if(mIsChannelOn4) {
+                    if (channelCount >= 4)
+                        mOscillators[3].render(static_cast<int16_t *>(audioData) + 3, channelCount, numFrames);
+                }
+
+                if(mIsChannelOn5) {
+                    if (channelCount >= 5)
+                        mOscillators[4].render(static_cast<int16_t *>(audioData) + 4, channelCount, numFrames);
+                }
+
+                if(mIsChannelOn6) {
+                    if (channelCount >= 6)
+                        mOscillators[5].render(static_cast<int16_t *>(audioData) + 5, channelCount, numFrames);
+                }
+
+                if(mIsChannelOn7) {
+                    if (channelCount >= 7)
+                        mOscillators[6].render(static_cast<int16_t *>(audioData) + 6, channelCount, numFrames);
+                }
+
+                if(mIsChannelOn8) {
+                    if (channelCount >= 8)
+                        mOscillators[7].render(static_cast<int16_t *>(audioData) + 7, channelCount, numFrames);
+                }
             }
+
         } else {
             memset(static_cast<uint8_t *>(audioData), 0,
                    sizeof(int16_t) * channelCount * numFrames);

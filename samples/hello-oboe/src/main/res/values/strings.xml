@@ -13,4 +13,12 @@
     <string name="audio_api_value_key">value</string>
     <string name="only_supported_on_api_26">Only supported in AAudio (API 26+)</string>
     <string name="audio_api">Audio API</string>
+    <string name="button_channel1">Channel 1</string>
+    <string name="button_channel2">Channel 2</string>
+    <string name="button_channel3">Channel 3</string>
+    <string name="button_channel4">Channel 4</string>
+    <string name="button_channel5">Channel 5</string>
+    <string name="button_channel6">Channel 6</string>
+    <string name="button_channel7">Channel 7</string>
+    <string name="button_channel8">Channel 8</string>
 </resources>

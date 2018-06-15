@@ -38,6 +38,15 @@ public:
 
     void setToneOn(bool isToneOn);
 
+    void setChannelOn1(bool isChannelOn);
+    void setChannelOn2(bool isChannelOn);
+    void setChannelOn3(bool isChannelOn);
+    void setChannelOn4(bool isChannelOn);
+    void setChannelOn5(bool isChannelOn);
+    void setChannelOn6(bool isChannelOn);
+    void setChannelOn7(bool isChannelOn);
+    void setChannelOn8(bool isChannelOn);
+
     void setBufferSizeInBursts(int32_t numBursts);
 
     double getCurrentOutputLatencyMillis();
@@ -58,6 +67,14 @@ private:
     int32_t mSampleRate;
     int32_t mChannelCount;
     bool mIsToneOn = false;
+    bool mIsChannelOn1 = false;
+    bool mIsChannelOn2 = false;
+    bool mIsChannelOn3 = false;
+    bool mIsChannelOn4 = false;
+    bool mIsChannelOn5 = false;
+    bool mIsChannelOn6 = false;
+    bool mIsChannelOn7 = false;
+    bool mIsChannelOn8 = false;
     int32_t mFramesPerBurst;
     double mCurrentOutputLatencyMillis = 0;
     int32_t mBufferSizeSelection = kBufferSizeAutomatic;

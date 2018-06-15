@@ -60,6 +60,127 @@ Java_com_google_sample_oboe_hellooboe_PlaybackEngine_native_1setToneOn(
 }
 
 JNIEXPORT void JNICALL
+Java_com_google_sample_oboe_hellooboe_PlaybackEngine_native_1setChannelOn1(
+        JNIEnv *env,
+        jclass,
+        jlong engineHandle,
+        jboolean isChannelOn) {
+
+    PlayAudioEngine *engine = (PlayAudioEngine *) engineHandle;
+    if (engine == nullptr) {
+        LOGE("Engine handle is invalid, call createHandle() to create a new one");
+        return;
+    }
+    engine->setChannelOn1(isChannelOn);
+}
+
+JNIEXPORT void JNICALL
+Java_com_google_sample_oboe_hellooboe_PlaybackEngine_native_1setChannelOn2(
+        JNIEnv *env,
+        jclass,
+        jlong engineHandle,
+        jboolean isChannelOn) {
+
+    PlayAudioEngine *engine = (PlayAudioEngine *) engineHandle;
+    if (engine == nullptr) {
+        LOGE("Engine handle is invalid, call createHandle() to create a new one");
+        return;
+    }
+    engine->setChannelOn2(isChannelOn);
+}
+
+JNIEXPORT void JNICALL
+Java_com_google_sample_oboe_hellooboe_PlaybackEngine_native_1setChannelOn3(
+        JNIEnv *env,
+        jclass,
+        jlong engineHandle,
+        jboolean isChannelOn) {
+
+    PlayAudioEngine *engine = (PlayAudioEngine *) engineHandle;
+    if (engine == nullptr) {
+        LOGE("Engine handle is invalid, call createHandle() to create a new one");
+        return;
+    }
+    engine->setChannelOn3(isChannelOn);
+}
+
+JNIEXPORT void JNICALL
+Java_com_google_sample_oboe_hellooboe_PlaybackEngine_native_1setChannelOn4(
+        JNIEnv *env,
+        jclass,
+        jlong engineHandle,
+        jboolean isChannelOn) {
+
+    PlayAudioEngine *engine = (PlayAudioEngine *) engineHandle;
+    if (engine == nullptr) {
+        LOGE("Engine handle is invalid, call createHandle() to create a new one");
+        return;
+    }
+    engine->setChannelOn4(isChannelOn);
+}
+
+JNIEXPORT void JNICALL
+Java_com_google_sample_oboe_hellooboe_PlaybackEngine_native_1setChannelOn5(
+        JNIEnv *env,
+        jclass,
+        jlong engineHandle,
+        jboolean isChannelOn) {
+
+    PlayAudioEngine *engine = (PlayAudioEngine *) engineHandle;
+    if (engine == nullptr) {
+        LOGE("Engine handle is invalid, call createHandle() to create a new one");
+        return;
+    }
+    engine->setChannelOn5(isChannelOn);
+}
+
+JNIEXPORT void JNICALL
+Java_com_google_sample_oboe_hellooboe_PlaybackEngine_native_1setChannelOn6(
+        JNIEnv *env,
+        jclass,
+        jlong engineHandle,
+        jboolean isChannelOn) {
+
+    PlayAudioEngine *engine = (PlayAudioEngine *) engineHandle;
+    if (engine == nullptr) {
+        LOGE("Engine handle is invalid, call createHandle() to create a new one");
+        return;
+    }
+    engine->setChannelOn6(isChannelOn);
+}
+
+JNIEXPORT void JNICALL
+Java_com_google_sample_oboe_hellooboe_PlaybackEngine_native_1setChannelOn7(
+        JNIEnv *env,
+        jclass,
+        jlong engineHandle,
+        jboolean isChannelOn) {
+
+    PlayAudioEngine *engine = (PlayAudioEngine *) engineHandle;
+    if (engine == nullptr) {
+        LOGE("Engine handle is invalid, call createHandle() to create a new one");
+        return;
+    }
+    engine->setChannelOn7(isChannelOn);
+}
+
+JNIEXPORT void JNICALL
+Java_com_google_sample_oboe_hellooboe_PlaybackEngine_native_1setChannelOn8(
+        JNIEnv *env,
+        jclass,
+        jlong engineHandle,
+        jboolean isChannelOn) {
+
+    PlayAudioEngine *engine = (PlayAudioEngine *) engineHandle;
+    if (engine == nullptr) {
+        LOGE("Engine handle is invalid, call createHandle() to create a new one");
+        return;
+    }
+    engine->setChannelOn8(isChannelOn);
+}
+
+
+JNIEXPORT void JNICALL
 Java_com_google_sample_oboe_hellooboe_PlaybackEngine_native_1setAudioApi(
         JNIEnv *env,
         jclass type,

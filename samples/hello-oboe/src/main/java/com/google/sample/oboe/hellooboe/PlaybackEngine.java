@@ -43,6 +43,38 @@ public class PlaybackEngine {
         if (mEngineHandle != 0) native_setToneOn(mEngineHandle, isToneOn);
     }
 
+    static void setChannelOn1(boolean isChannelOn){
+        if (mEngineHandle != 0) native_setChannelOn1(mEngineHandle, isChannelOn);
+    }
+
+    static void setChannelOn2(boolean isChannelOn){
+        if (mEngineHandle != 0) native_setChannelOn2(mEngineHandle, isChannelOn);
+    }
+
+    static void setChannelOn3(boolean isChannelOn){
+        if (mEngineHandle != 0) native_setChannelOn3(mEngineHandle, isChannelOn);
+    }
+
+    static void setChannelOn4(boolean isChannelOn){
+        if (mEngineHandle != 0) native_setChannelOn4(mEngineHandle, isChannelOn);
+    }
+
+    static void setChannelOn5(boolean isChannelOn){
+        if (mEngineHandle != 0) native_setChannelOn5(mEngineHandle, isChannelOn);
+    }
+
+    static void setChannelOn6(boolean isChannelOn){
+        if (mEngineHandle != 0) native_setChannelOn6(mEngineHandle, isChannelOn);
+    }
+
+    static void setChannelOn7(boolean isChannelOn){
+        if (mEngineHandle != 0) native_setChannelOn7(mEngineHandle, isChannelOn);
+    }
+
+    static void setChannelOn8(boolean isChannelOn){
+        if (mEngineHandle != 0) native_setChannelOn8(mEngineHandle, isChannelOn);
+    }
+
     static void setAudioApi(int audioApi){
         if (mEngineHandle != 0) native_setAudioApi(mEngineHandle, audioApi);
     }
@@ -72,6 +104,14 @@ public class PlaybackEngine {
     private static native long native_createEngine();
     private static native void native_deleteEngine(long engineHandle);
     private static native void native_setToneOn(long engineHandle, boolean isToneOn);
+    private static native void native_setChannelOn1(long engineHandle, boolean isChannelOn);
+    private static native void native_setChannelOn2(long engineHandle, boolean isChannelOn);
+    private static native void native_setChannelOn3(long engineHandle, boolean isChannelOn);
+    private static native void native_setChannelOn4(long engineHandle, boolean isChannelOn);
+    private static native void native_setChannelOn5(long engineHandle, boolean isChannelOn);
+    private static native void native_setChannelOn6(long engineHandle, boolean isChannelOn);
+    private static native void native_setChannelOn7(long engineHandle, boolean isChannelOn);
+    private static native void native_setChannelOn8(long engineHandle, boolean isChannelOn);
     private static native void native_setAudioApi(long engineHandle, int audioApi);
     private static native void native_setAudioDeviceId(long engineHandle, int deviceId);
     private static native void native_setChannelCount(long mEngineHandle, int channelCount);

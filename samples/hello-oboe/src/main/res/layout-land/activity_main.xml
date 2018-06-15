@@ -14,116 +14,118 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".MainActivity">
 
     <TextView
+        android:id="@+id/audioApisTitleText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/audio_api"
-        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
         android:layout_marginStart="@dimen/activity_horizontal_margin"
         android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:text="@string/audio_api"
         app:layout_constraintLeft_toLeftOf="parent"
-        android:id="@+id/audioApisTitleText"
-        android:layout_marginLeft="@dimen/activity_horizontal_margin" />
+        app:layout_constraintTop_toTopOf="parent"
+        />
+
     <Spinner
         android:id="@+id/audioApiSpinner"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
         android:layout_marginStart="@dimen/activity_horizontal_margin"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/audioApisTitleText"
-        android:layout_marginLeft="@dimen/activity_horizontal_margin" />
+        app:layout_constraintTop_toBottomOf="@+id/audioApisTitleText" />
+
     <TextView
+        android:id="@+id/playbackDeviceTitleText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/playback_device"
-        app:layout_constraintTop_toBottomOf="@+id/audioApiSpinner"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
         android:layout_marginStart="@dimen/activity_horizontal_margin"
         android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:text="@string/playback_device"
         app:layout_constraintLeft_toLeftOf="parent"
-        android:id="@+id/playbackDeviceTitleText"
-        android:layout_marginLeft="@dimen/activity_horizontal_margin" />
+        app:layout_constraintTop_toBottomOf="@+id/audioApiSpinner" />
 
     <com.google.sample.audio_device.AudioDeviceSpinner
         android:id="@+id/playbackDevicesSpinner"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
         android:layout_marginStart="@dimen/activity_horizontal_margin"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/playbackDeviceTitleText"
-        android:layout_marginLeft="@dimen/activity_horizontal_margin" />
+        app:layout_constraintTop_toBottomOf="@+id/playbackDeviceTitleText" />
 
     <Spinner
         android:id="@+id/channelCountSpinner"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
         android:layout_marginTop="8dp"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/channelCountTitleText"
-        android:layout_marginStart="@dimen/activity_horizontal_margin" />
+        app:layout_constraintTop_toBottomOf="@+id/channelCountTitleText" />
 
     <TextView
         android:id="@+id/channelCountTitleText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
         android:layout_marginTop="8dp"
         android:text="Channel count"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/playbackDevicesSpinner"
-        android:layout_marginStart="@dimen/activity_horizontal_margin" />
+        app:layout_constraintTop_toBottomOf="@+id/playbackDevicesSpinner" />
 
     <TextView
         android:id="@+id/bufferSizeTitleText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
         android:layout_marginTop="8dp"
         android:text="@string/buffer_size_title"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/channelCountSpinner"
-        android:layout_marginStart="@dimen/activity_horizontal_margin" />
+        app:layout_constraintTop_toBottomOf="@+id/channelCountSpinner" />
 
     <Spinner
         android:id="@+id/bufferSizeSpinner"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
         android:layout_marginTop="4dp"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/bufferSizeTitleText"
-        android:layout_marginStart="@dimen/activity_horizontal_margin" />
+        app:layout_constraintTop_toBottomOf="@+id/bufferSizeTitleText" />
 
     <TextView
         android:id="@+id/latencyText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
         android:layout_marginTop="12dp"
         android:text="@string/latency"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/bufferSizeSpinner"
-        android:layout_marginStart="@dimen/activity_horizontal_margin" />
+        app:layout_constraintTop_toBottomOf="@+id/bufferSizeSpinner" />
 
     <TextView
         android:id="@+id/userInstructionView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
         android:layout_marginTop="20dp"
         android:lines="3"
         android:text="@string/init_status"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/latencyText"
-        android:layout_marginStart="@dimen/activity_horizontal_margin" />
+        app:layout_constraintTop_toBottomOf="@+id/latencyText" />
 
     <Button
         android:id="@+id/button_channel1"
@@ -131,12 +133,12 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:text="@string/button_channel1"
-        app:layout_constraintHorizontal_chainStyle="spread"
-        app:layout_constraintVertical_chainStyle="spread"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/button_channel2"
         app:layout_constraintBottom_toTopOf="@id/button_channel3"
-        app:layout_constraintTop_toBottomOf="@+id/userInstructionView" />
+        app:layout_constraintEnd_toStartOf="@id/button_channel2"
+        app:layout_constraintHorizontal_chainStyle="spread"
+        app:layout_constraintStart_toStartOf="@id/guideline_centre"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="spread" />
 
 
     <Button
@@ -145,12 +147,12 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:text="@string/button_channel2"
-        app:layout_constraintHorizontal_chainStyle="spread"
-        app:layout_constraintVertical_chainStyle="spread"
-        app:layout_constraintStart_toEndOf="@+id/button_channel1"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@id/button_channel4"
-        app:layout_constraintTop_toBottomOf="@+id/userInstructionView" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_chainStyle="spread"
+        app:layout_constraintStart_toEndOf="@+id/button_channel1"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="spread" />
 
     <Button
         android:id="@+id/button_channel3"
@@ -158,12 +160,12 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:text="@string/button_channel3"
-        app:layout_constraintHorizontal_chainStyle="spread"
-        app:layout_constraintVertical_chainStyle="spread"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/button_channel4"
         app:layout_constraintBottom_toTopOf="@+id/button_channel5"
-        app:layout_constraintTop_toBottomOf="@+id/button_channel1" />
+        app:layout_constraintEnd_toStartOf="@+id/button_channel4"
+        app:layout_constraintHorizontal_chainStyle="spread"
+        app:layout_constraintStart_toStartOf="@id/guideline_centre"
+        app:layout_constraintTop_toBottomOf="@+id/button_channel1"
+        app:layout_constraintVertical_chainStyle="spread" />
 
     <Button
         android:id="@+id/button_channel4"
@@ -171,12 +173,12 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:text="@string/button_channel4"
-        app:layout_constraintHorizontal_chainStyle="spread"
-        app:layout_constraintVertical_chainStyle="spread"
-        app:layout_constraintStart_toEndOf="@id/button_channel3"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/button_channel6"
-        app:layout_constraintTop_toBottomOf="@+id/button_channel2" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_chainStyle="spread"
+        app:layout_constraintStart_toEndOf="@id/button_channel3"
+        app:layout_constraintTop_toBottomOf="@+id/button_channel2"
+        app:layout_constraintVertical_chainStyle="spread" />
 
     <Button
         android:id="@+id/button_channel5"
@@ -187,7 +189,7 @@
         app:layout_constraintBottom_toTopOf="@+id/button_channel7"
         app:layout_constraintEnd_toStartOf="@+id/button_channel6"
         app:layout_constraintHorizontal_chainStyle="spread"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toStartOf="@id/guideline_centre"
         app:layout_constraintTop_toBottomOf="@+id/button_channel3"
         app:layout_constraintVertical_chainStyle="spread" />
 
@@ -211,11 +213,11 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:text="@string/button_channel7"
-        app:layout_constraintTop_toBottomOf="@+id/button_channel5"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/button_channel8"
         app:layout_constraintHorizontal_chainStyle="spread"
+        app:layout_constraintStart_toStartOf="@id/guideline_centre"
+        app:layout_constraintTop_toBottomOf="@+id/button_channel5"
         app:layout_constraintVertical_chainStyle="spread" />
 
     <Button
@@ -230,6 +232,13 @@
         app:layout_constraintStart_toEndOf="@id/button_channel7"
         app:layout_constraintTop_toBottomOf="@+id/button_channel6"
         app:layout_constraintVertical_chainStyle="spread" />
+
+    <android.support.constraint.Guideline
+        android:id="@+id/guideline_centre"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.5" />
     />
 
 </android.support.constraint.ConstraintLayout>
