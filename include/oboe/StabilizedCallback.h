@@ -50,6 +50,17 @@ private:
     int64_t mEpochTimeNanos = 0;
     double  mOpsPerNano = 1;
 
+    // Instrumentation fields
+    static constexpr int kTotalCallbacks = 2000;
+    int mCallbackCount = 0;
+
+    struct CallbackTime {
+        int64_t startTime;
+        int32_t numFrames;
+    };
+
+    CallbackTime mCallbackTimes[kTotalCallbacks];
+
     void generateLoad(int64_t durationNanos);
 };
 

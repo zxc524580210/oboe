@@ -17,6 +17,7 @@
 #include "oboe/StabilizedCallback.h"
 #include "common/AudioClock.h"
 #include "common/Trace.h"
+#include "OboeDebug.h"
 
 constexpr int32_t kLoadGenerationStepSizeNanos = 20000;
 constexpr float kPercentageOfCallbackToUse = 0.8;
@@ -39,6 +40,15 @@ DataCallbackResult
 StabilizedCallback::onAudioReady(AudioStream *oboeStream, void *audioData, int32_t numFrames) {
 
     int64_t startTimeNanos = AudioClock::getNanoseconds();
+
+    // Instrumentation
+    mCallbackTimes[mCallbackCount].startTime = startTimeNanos;
+    mCallbackTimes[mCallbackCount++].numFrames = numFrames;
+
+    if (mCallbackCount > kTotalCallbacks){
+        LOGD("Returning STOP from callback");
+        return DataCallbackResult::Stop;
+    }
 
     if (mFrameCount == 0){
         mEpochTimeNanos = startTimeNanos;
