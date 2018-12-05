@@ -18,9 +18,19 @@
 #define OBOE_STABILIZEDCALLBACK_H
 
 #include <cstdint>
+#include <common/OboeDebug.h>
 #include "oboe/AudioStream.h"
+#include <iostream>
+#include <fstream>
 
 namespace oboe {
+
+
+static constexpr int kTotalCallbacks = 2000;
+struct CallbackTime {
+    int64_t startTime;
+    int32_t numFrames;
+};
 
 class StabilizedCallback : public AudioStreamCallback {
 
@@ -43,6 +53,22 @@ public:
         return mCallback->onErrorAfterClose(oboeStream, error);
     }
 
+    void onCallbacksStopped(){
+
+        std::ofstream myfile;
+        myfile.open("/sdcard/Download/callbacks.csv");
+
+        if (myfile.is_open()){
+            for (int i = 0; i < kTotalCallbacks; ++i) {
+                myfile << i << "," << mCallbackTimes[i].startTime << "," << mCallbackTimes[i].numFrames << std::endl;
+            }
+            myfile.close();
+            LOGD("Wrote callback times to file");
+        } else {
+            LOGE("Error: %d (%s)", errno, strerror(errno));
+        }
+    }
+
 private:
 
     AudioStreamCallback *mCallback = nullptr;
@@ -51,14 +77,7 @@ private:
     double  mOpsPerNano = 1;
 
     // Instrumentation fields
-    static constexpr int kTotalCallbacks = 2000;
     int mCallbackCount = 0;
-
-    struct CallbackTime {
-        int64_t startTime;
-        int32_t numFrames;
-    };
-
     CallbackTime mCallbackTimes[kTotalCallbacks];
 
     void generateLoad(int64_t durationNanos);

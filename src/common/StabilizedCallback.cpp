@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+#include <thread>
 #include "oboe/StabilizedCallback.h"
 #include "common/AudioClock.h"
 #include "common/Trace.h"
@@ -41,14 +42,18 @@ StabilizedCallback::onAudioReady(AudioStream *oboeStream, void *audioData, int32
 
     int64_t startTimeNanos = AudioClock::getNanoseconds();
 
+    if (mCallbackCount == kTotalCallbacks) {
+        // Inform any listeners that we have finished playing
+        //std::function<void(void)> callbacksStoppedFunction = std::bind(&);
+        std::thread callbacksStoppedThread(&StabilizedCallback::onCallbacksStopped, this);
+        callbacksStoppedThread.detach();
+    }
+
+    if (mCallbackCount >= kTotalCallbacks) return DataCallbackResult::Stop;
+
     // Instrumentation
     mCallbackTimes[mCallbackCount].startTime = startTimeNanos;
     mCallbackTimes[mCallbackCount++].numFrames = numFrames;
-
-    if (mCallbackCount > kTotalCallbacks){
-        LOGD("Returning STOP from callback");
-        return DataCallbackResult::Stop;
-    }
 
     if (mFrameCount == 0){
         mEpochTimeNanos = startTimeNanos;

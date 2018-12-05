@@ -16,7 +16,12 @@ package com.example.oboe.megadrone;
  * limitations under the License.
  */
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -25,6 +30,7 @@ import android.view.MotionEvent;
 public class MainActivity extends AppCompatActivity {
 
     private final String TAG = MainActivity.class.toString();
+    private static final int MEGA_DRONE_REQUEST = 0;
 
     // Used to load the 'native-lib' library on application startup.
     static {
@@ -35,6 +41,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        if (!hasWriteStoragePermission()){
+            requestWriteStoragePermission();
+        }
     }
 
     protected void onStart(){
@@ -85,7 +95,37 @@ public class MainActivity extends AppCompatActivity {
 
     private native void tap(boolean b);
 
+    private boolean hasWriteStoragePermission() {
+        return (ActivityCompat.checkSelfPermission(
+                this, Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
+                PackageManager.PERMISSION_GRANTED);
+    }
 
+    private void requestWriteStoragePermission(){
+        ActivityCompat.requestPermissions(
+                this,
+                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                MEGA_DRONE_REQUEST);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+
+        if (MEGA_DRONE_REQUEST != requestCode) {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+            return;
+        }
+
+        if (grantResults.length != 1 ||
+                grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+
+        } else {
+            // Permission was granted
+            Log.d(TAG, "Runtime permissions granted");
+
+        }
+    }
 }
 
 
