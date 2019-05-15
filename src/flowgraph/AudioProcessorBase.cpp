@@ -16,7 +16,9 @@
 
 #include <algorithm>
 #include <sys/types.h>
+#include <cinttypes>
 #include "AudioProcessorBase.h"
+#include "../common/OboeDebug.h"
 
 using namespace flowgraph;
 
@@ -33,6 +35,10 @@ int32_t AudioProcessorBase::pullData(int64_t framePosition, int32_t numFrames) {
         if (frameCount > 0) {
             mFramesValid = onProcess(frameCount);
         }
+    } else {
+        LOGW("Recursion detected. framePosition %" PRId64 " is <= mLastFramePosition %" PRId64,
+                framePosition,
+                mLastFramePosition);
     }
     return mFramesValid;
 }

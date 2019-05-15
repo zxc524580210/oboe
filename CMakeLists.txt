@@ -50,8 +50,8 @@ target_compile_options(oboe
     -Wall
     -Wextra-semi
     -Wshadow
-    -Wshadow-field
-    -Ofast
+    #-Wshadow-field
+    -O3
     "$<$<CONFIG:DEBUG>:-Werror>")
 
 # Enable logging for debug builds

@@ -30,6 +30,8 @@ void AudioEngine::start(std::vector<int> cpuIds) {
     builder.setCallback(mStabilizedCallback);
     builder.setPerformanceMode(PerformanceMode::LowLatency);
     builder.setSharingMode(SharingMode::Exclusive);
+    builder.setChannelCount(1);
+    builder.setFormat(AudioFormat::Float);
 
     Result result = builder.openStream(&mStream);
     if (result != Result::OK){

@@ -11,17 +11,19 @@ set (OBOE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../..)
 add_subdirectory(${OBOE_DIR} ./oboe-bin)
 
 # Include the Oboe headers
-include_directories(${OBOE_DIR}/include ${OBOE_DIR}/samples)
+include_directories(${OBOE_DIR}/include ${OBOE_DIR}/samples ${OBOE_DIR}/src/flowgraph)
 
 ### END OBOE INCLUDE SECTION ###
 
 add_library( megadrone SHARED
         src/main/cpp/native-lib.cpp
         src/main/cpp/AudioEngine.cpp
+        ${OBOE_DIR}/samples/shared/SineOscillator.cpp
+        ${OBOE_DIR}/samples/shared/OscillatorBase.cpp
         )
 
 target_link_libraries( megadrone log oboe )
 
 # Enable optimization flags: if having problems with source level debugging,
 # disable -Ofast ( and debug ), re-enable it after done debugging.
-target_compile_options(megadrone PRIVATE -Wall -Werror -Ofast)
+target_compile_options(megadrone PRIVATE -Wall -Werror -O3)

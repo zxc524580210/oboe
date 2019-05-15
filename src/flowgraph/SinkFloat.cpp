@@ -18,6 +18,7 @@
 #include <unistd.h>
 #include "AudioProcessorBase.h"
 #include "SinkFloat.h"
+#include "../common/OboeDebug.h"
 
 using namespace flowgraph;
 
@@ -33,9 +34,6 @@ int32_t SinkFloat::read(int64_t framePosition, void *data, int32_t numFrames) {
     while (framesLeft > 0) {
         // Run the graph and pull data through the input port.
         int32_t framePulled = pullData(framePosition, framesLeft);
-        if (framePulled <= 0) {
-            break;
-        }
         const float *signal = input.getBuffer();
         int32_t numSamples = framePulled * channelCount;
         memcpy(floatData, signal, numSamples * sizeof(float));
