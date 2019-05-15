@@ -18,7 +18,7 @@ include_directories(${OBOE_DIR}/include ${OBOE_DIR}/samples ${OBOE_DIR}/src/flow
 add_library( megadrone SHARED
         src/main/cpp/native-lib.cpp
         src/main/cpp/AudioEngine.cpp
-        ${OBOE_DIR}/samples/shared/SineOscillator.cpp
+        ${OBOE_DIR}/samples/shared/SquareOscillator.cpp
         ${OBOE_DIR}/samples/shared/OscillatorBase.cpp
         )
 
@@ -26,4 +26,4 @@ target_link_libraries( megadrone log oboe )
 
 # Enable optimization flags: if having problems with source level debugging,
 # disable -Ofast ( and debug ), re-enable it after done debugging.
-target_compile_options(megadrone PRIVATE -Wall -Werror -O3)
+target_compile_options(megadrone PRIVATE -Wall -Werror -Ofast)

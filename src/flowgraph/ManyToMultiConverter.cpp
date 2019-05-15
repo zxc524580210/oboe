@@ -24,7 +24,6 @@ ManyToMultiConverter::ManyToMultiConverter(int32_t channelCount)
         : inputs(channelCount)
         , output(*this, channelCount) {
     for (int i = 0; i < channelCount; i++) {
-        // TODO: Does this actually run?
         inputs[i] = std::make_unique<AudioFloatInputPort>(*this, 1);
     }
 }

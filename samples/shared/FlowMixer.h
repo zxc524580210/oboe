@@ -37,6 +37,7 @@ public:
         float *mixingBuffer = output.getBuffer();
         memset(mixingBuffer, 0, sizeof(float) * numFrames * output.getSamplesPerFrame());
 
+        // Mix each input
         for (auto &inputPort : inputs){
 
             float *inputBuffer = inputPort->getBuffer();
@@ -50,7 +51,6 @@ public:
 
     std::vector<std::unique_ptr<flowgraph::AudioFloatInputPort>> inputs;
     flowgraph::AudioFloatOutputPort output;
-
 };
 
 
