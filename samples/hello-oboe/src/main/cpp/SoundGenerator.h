@@ -22,8 +22,10 @@
 #include <shared/Oscillator.h>
 #include <shared/SineOscillator.h>
 #include "../../../../../src/flowgraph/ManyToMultiConverter.h"
+#include "../../../../../src/flowgraph/SinkFloat.h"
+#include "../../../../../src/flowgraph/RampLinear.h"
 
-#include <SinkFloat.h>
+
 
 /**
  * Generates a fixed frequency tone for each channel.
@@ -56,6 +58,7 @@ private:
     const std::unique_ptr<SineOscillator[]> mSineOscillators;
     ManyToMultiConverter mManyToMultiConverter;
     flowgraph::SinkFloat mSinkFloat;
+    flowgraph::RampLinear mRampLinear;
     int64_t mFramePosition = 0;
 
 };

@@ -22,7 +22,8 @@ SoundGenerator::SoundGenerator(int32_t sampleRate, int32_t maxFrames, int32_t ch
         , mChannelCount(channelCount)
         , mSineOscillators(std::make_unique<SineOscillator[]>(channelCount))
         , mManyToMultiConverter(channelCount)
-        , mSinkFloat(channelCount){
+        , mSinkFloat(channelCount)
+        , mRampLinear(channelCount) {
 
     double frequency = 440.0;
     constexpr double interval = 110.0;
@@ -35,7 +36,9 @@ SoundGenerator::SoundGenerator(int32_t sampleRate, int32_t maxFrames, int32_t ch
         mSineOscillators[i].output.connect(mManyToMultiConverter.inputs[i].get());
         frequency += interval;
     }
-    mManyToMultiConverter.output.connect(&mSinkFloat.input);
+    mManyToMultiConverter.output.connect(&mRampLinear.input);
+    mRampLinear.setTarget(0.0);
+    mRampLinear.output.connect(&mSinkFloat.input);
 
 }
 
@@ -45,7 +48,9 @@ void SoundGenerator::renderAudio(float *audioData, int32_t numFrames) {
 }
 
 void SoundGenerator::setTonesOn(bool isOn) {
-    for (int i = 0; i < mChannelCount; ++i) {
-        mOscillators[i].setWaveOn(isOn);
+    if (isOn){
+        mRampLinear.setTarget(1.0);
+    } else {
+        mRampLinear.setTarget(0.0);
     }
 }
