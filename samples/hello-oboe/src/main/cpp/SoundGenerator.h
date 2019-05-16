@@ -20,6 +20,10 @@
 
 #include <shared/IRenderableAudio.h>
 #include <shared/Oscillator.h>
+#include <shared/SineOscillator.h>
+#include "../../../../../src/flowgraph/ManyToMultiConverter.h"
+
+#include <SinkFloat.h>
 
 /**
  * Generates a fixed frequency tone for each channel.
@@ -49,7 +53,11 @@ private:
     const int32_t mSampleRate;
     const int32_t mChannelCount;
     const std::unique_ptr<Oscillator[]> mOscillators;
-    const std::unique_ptr<float[]> mBuffer;
+    const std::unique_ptr<SineOscillator[]> mSineOscillators;
+    ManyToMultiConverter mManyToMultiConverter;
+    flowgraph::SinkFloat mSinkFloat;
+    int64_t mFramePosition = 0;
+
 };
 
 
