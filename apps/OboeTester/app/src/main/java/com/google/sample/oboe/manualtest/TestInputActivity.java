@@ -161,22 +161,26 @@ public class TestInputActivity  extends TestAudioActivity
         return "input";
     }
 
+    String getSharedWaveName() {
+        return "oboe_" +  getWaveTag() + "_" + getTimestampString() + ".wav";
+    }
+
     @NonNull
-    private File createFileName() {
+    private File createSharedFile(String name) {
         // Get directory and filename
         File dir = getExternalFilesDir(Environment.DIRECTORY_MUSIC);
-        return new File(dir, "oboe_" +  getWaveTag() + ".wav");
+        return new File(dir, name);
     }
 
     public void shareWaveFile() {
+        String fileName = getSharedWaveName();
         // Share WAVE file via GMail, Drive or other method.
-        File file = createFileName();
+        File file = createSharedFile(fileName);
         int result = saveWaveFile(file);
         if (result > 0) {
             Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
             sharingIntent.setType("audio/wav");
-            String subjectText = "OboeTester " +  getWaveTag() + " at " + getTimestampString();
-            sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, subjectText);
+            sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, fileName);
             Uri uri = FileProvider.getUriForFile(this,
                     BuildConfig.APPLICATION_ID + ".provider",
                     file);

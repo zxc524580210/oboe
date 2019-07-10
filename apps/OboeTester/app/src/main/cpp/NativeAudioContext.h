@@ -64,7 +64,7 @@
 #define LIB_AAUDIO_NAME          "libaaudio.so"
 #define FUNCTION_IS_MMAP         "AAudioStream_isMMapUsed"
 
-#define SECONDS_TO_RECORD        10
+#define SECONDS_TO_RECORD        30
 
 typedef struct AAudioStreamStruct         AAudioStream;
 
