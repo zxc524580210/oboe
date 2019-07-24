@@ -25,6 +25,8 @@ add_subdirectory(${OBOE_DIR} ./oboe-bin)
 
 add_library(liveEffect
     SHARED
+        AAssetDataSource.cpp
+        NDKExtractor.cpp
         LiveEffectEngine.cpp
         FullDuplexStream.cpp
         jni_bridge.cpp
@@ -38,6 +40,7 @@ target_link_libraries(liveEffect
         oboe
         android
         atomic
+        mediandk
         log)
 
 # Enable optimization flags: if having problems with source level debugging,

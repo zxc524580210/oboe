@@ -22,10 +22,11 @@
 #include <string>
 #include <thread>
 #include "FullDuplexPass.h"
+#include <android/asset_manager.h>
 
 class LiveEffectEngine : public oboe::AudioStreamCallback {
    public:
-    LiveEffectEngine();
+    LiveEffectEngine(AAssetManager *assetManager);
     ~LiveEffectEngine();
     void setRecordingDeviceId(int32_t deviceId);
     void setPlaybackDeviceId(int32_t deviceId);
@@ -55,6 +56,7 @@ class LiveEffectEngine : public oboe::AudioStreamCallback {
     oboe::AudioStream *mRecordingStream = nullptr;
     oboe::AudioStream *mPlayStream = nullptr;
     oboe::AudioApi mAudioApi = oboe::AudioApi::AAudio;
+    AAssetManager *mAssetManager = nullptr;
 
     void closeStream(oboe::AudioStream *stream);
 

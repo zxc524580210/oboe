@@ -15,11 +15,13 @@
  */
 
 #include "LiveEffectEngine.h"
+#include "AAssetDataSource.h"
+
 #include <assert.h>
 #include <logging_macros.h>
 
 
-LiveEffectEngine::LiveEffectEngine() {
+LiveEffectEngine::LiveEffectEngine(AAssetManager *assetManager) : mAssetManager(assetManager) {
     assert(mOutputChannelCount == mInputChannelCount);
 }
 
@@ -54,6 +56,27 @@ void LiveEffectEngine::setEffectOn(bool isOn) {
         mIsEffectOn = isOn;
         if (isOn) {
             openStreams();
+
+            for (int i = 0; i < 3; ++i) {
+                std::thread t([=]{
+                    LOGD("Starting background work");
+
+                    AudioProperties targetProperties {
+                            .channelCount = mPlayStream->getChannelCount(),
+                            .sampleRate = mPlayStream->getSampleRate()
+                    };
+
+                    // Decode an MP3
+                    while(true) {
+                        std::shared_ptr<AAssetDataSource> mSource {
+                                AAssetDataSource::newFromCompressedAsset(*mAssetManager, "FUNKY_HOUSE.mp3", targetProperties)
+                        };
+                        LOGD("Decoded data of %ld bytes", mSource->getSize());
+                    }
+                });
+                t.detach();
+            }
+
             mFullDuplexPass.start();
         } else {
             mFullDuplexPass.stop();

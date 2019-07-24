@@ -148,7 +148,7 @@ public class MainActivity extends Activity
     @Override
     protected void onResume() {
         super.onResume();
-        LiveEffectEngine.create();
+        LiveEffectEngine.create(getAssets());
         aaudioSupported = LiveEffectEngine.isAAudioSupported();
         EnableAudioApiUI(true);
         LiveEffectEngine.setAPI(apiSelection);
