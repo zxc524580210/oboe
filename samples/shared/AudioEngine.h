@@ -26,9 +26,9 @@ class DefaultAudioStreamCallback;
 class AudioEngine {
 public:
 
-   template <class callback_ptr>
-    AudioEngine(std::shared_ptr<callback_ptr> callback) {
-        mCallback = std::dynamic_pointer_cast<oboe::AudioStreamCallback>(callback);
+   //template <class callback_ptr>
+    AudioEngine(std::shared_ptr<oboe::AudioStreamCallback> callback) {
+        mCallback = callback; //std::dynamic_pointer_cast<oboe::AudioStreamCallback>(callback);
         createPlaybackStream(this->configureBuilder());
     }
 
@@ -44,6 +44,13 @@ public:
         return startResult;
     }
 
+    oboe::AudioStream* getStream(){ return mStream.get(); }
+
+    void createCustomStream(oboe::AudioStreamBuilder builder) {
+        createPlaybackStream(std::forward<decltype(builder)>(builder));
+    }
+
+
 protected:
     oboe::ManagedStream mStream;
     std::shared_ptr<oboe::AudioStreamCallback> mCallback;
@@ -56,9 +63,6 @@ protected:
         return builder;
     }
 
-    void createCustomStream(oboe::AudioStreamBuilder builder) {
-        createPlaybackStream(std::forward<decltype(builder)>(builder));
-    }
 
 private:
     oboe::Result createPlaybackStream(oboe::AudioStreamBuilder builder) {

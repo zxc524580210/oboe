@@ -48,9 +48,9 @@ public:
         }
     }
 
-    void setParent(AudioEngine &parent) {
+    /*void setParent(AudioEngine &parent) {
         mParent = &parent;
-    }
+    }*/
 
     void setSource(std::shared_ptr<IRenderableAudio> renderable) {
         mRenderable = renderable;

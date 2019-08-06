@@ -26,7 +26,7 @@
 constexpr int32_t kBufferSizeAutomatic = 0;
 
 // This sample inherits the AudioEngine in the shared folder, with a custom audio source and callback
-class HelloOboeEngine : public AudioEngine {
+class HelloOboeEngine {
 
 public:
     HelloOboeEngine();
@@ -73,8 +73,9 @@ public:
 
 private:
 
-    std::shared_ptr<LatencyTuningCallback>
-            mLatencyCallback = std::dynamic_pointer_cast<LatencyTuningCallback>(mCallback);
+    std::unique_ptr<AudioEngine> mAudioEngine;
+
+    std::shared_ptr<LatencyTuningCallback> mLatencyCallback; // = std::dynamic_pointer_cast<LatencyTuningCallback>(mCallback);
 
     std::shared_ptr<SoundGenerator> mAudioSource;
 
