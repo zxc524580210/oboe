@@ -74,6 +74,8 @@ SLuint32 AudioInputStreamOpenSLES::channelCountToChannelMask(int channelCount) c
 }
 
 Result AudioInputStreamOpenSLES::open() {
+    logUnsupportedAttributes();
+
     SLAndroidConfigurationItf configItf = nullptr;
 
     if (getSdkVersion() < __ANDROID_API_M__ && mFormat == AudioFormat::Float){
@@ -196,12 +198,17 @@ Result AudioInputStreamOpenSLES::open() {
         goto error;
     }
 
+    oboeResult = configureBufferSizes();
+    if (Result::OK != oboeResult) {
+        goto error;
+    }
+
     allocateFifo();
 
     setState(StreamState::Open);
     return Result::OK;
 
-    error:
+error:
     return Result::ErrorInternal; // TODO convert error from SLES to OBOE
 }
 
@@ -224,7 +231,7 @@ Result AudioInputStreamOpenSLES::close() {
 }
 
 Result AudioInputStreamOpenSLES::setRecordState_l(SLuint32 newState) {
-    LOGD("AudioInputStreamOpenSLES::%s(%d)", __func__, newState);
+    LOGD("AudioInputStreamOpenSLES::%s(%u)", __func__, newState);
     Result result = Result::OK;
 
     if (mRecordInterface == nullptr) {
@@ -232,8 +239,10 @@ Result AudioInputStreamOpenSLES::setRecordState_l(SLuint32 newState) {
         return Result::ErrorInvalidState;
     }
     SLresult slResult = (*mRecordInterface)->SetRecordState(mRecordInterface, newState);
+    //LOGD("AudioInputStreamOpenSLES::%s(%u) returned %u", __func__, newState, slResult);
     if (SL_RESULT_SUCCESS != slResult) {
-        LOGE("AudioInputStreamOpenSLES::%s() returned %s", __func__, getSLErrStr(slResult));
+        LOGE("AudioInputStreamOpenSLES::%s(%u) returned error %s",
+                __func__, newState, getSLErrStr(slResult));
         result = Result::ErrorInternal; // TODO review
     }
     return result;

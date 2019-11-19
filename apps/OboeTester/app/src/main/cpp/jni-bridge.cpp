@@ -42,12 +42,14 @@ Java_com_google_sample_oboe_manualtest_OboeAudioStream_openNative(JNIEnv *env, j
                                                        jint format,
                                                        jint sharingMode,
                                                        jint performanceMode,
+                                                       jint inputPreset,
                                                        jint deviceId,
                                                        jint sessionId,
                                                        jint framesPerBurst,
                                                        jboolean channelConversionAllowed,
                                                        jboolean formatConversionAllowed,
                                                        jint rateConversionQuality,
+                                                       jboolean isMMap,
                                                        jboolean isInput);
 JNIEXPORT void JNICALL
 Java_com_google_sample_oboe_manualtest_OboeAudioStream_close(JNIEnv *env, jobject, jint);
@@ -85,6 +87,11 @@ Java_com_google_sample_oboe_manualtest_OboeAudioOutputStream_setAmplitude(JNIEnv
 /**********************  JNI Implementations *************************************/
 /*********************************************************************************/
 
+JNIEXPORT jboolean JNICALL
+Java_com_google_sample_oboe_manualtest_NativeEngine_isMMapSupported(JNIEnv *env, jclass type) {
+    return AAudioExtensions::getInstance().isMMapSupported();
+}
+
 JNIEXPORT jint JNICALL
 Java_com_google_sample_oboe_manualtest_OboeAudioStream_openNative(
         JNIEnv *env, jobject synth,
@@ -94,28 +101,32 @@ Java_com_google_sample_oboe_manualtest_OboeAudioStream_openNative(
         jint format,
         jint sharingMode,
         jint performanceMode,
+        jint inputPreset,
         jint deviceId,
         jint sessionId,
         jint framesPerBurst,
         jboolean channelConversionAllowed,
         jboolean formatConversionAllowed,
         jint rateConversionQuality,
+        jboolean isMMap,
         jboolean isInput) {
     LOGD("OboeAudioStream_openNative: sampleRate = %d, framesPerBurst = %d", sampleRate, framesPerBurst);
 
     return (jint) engine.getCurrentActivity()->open(nativeApi,
-                              sampleRate,
-                              channelCount,
-                              format,
-                              sharingMode,
-                              performanceMode,
-                              deviceId,
-                              sessionId,
-                              framesPerBurst,
-                              channelConversionAllowed,
-                              formatConversionAllowed,
-                              rateConversionQuality,
-                              isInput);
+                                                    sampleRate,
+                                                    channelCount,
+                                                    format,
+                                                    sharingMode,
+                                                    performanceMode,
+                                                    inputPreset,
+                                                    deviceId,
+                                                    sessionId,
+                                                    framesPerBurst,
+                                                    channelConversionAllowed,
+                                                    formatConversionAllowed,
+                                                    rateConversionQuality,
+                                                    isMMap,
+                                                    isInput);
 }
 
 JNIEXPORT jint JNICALL
@@ -238,6 +249,17 @@ Java_com_google_sample_oboe_manualtest_OboeAudioStream_getPerformanceMode(
 }
 
 JNIEXPORT jint JNICALL
+Java_com_google_sample_oboe_manualtest_OboeAudioStream_getInputPreset(
+        JNIEnv *env, jobject, jint streamIndex) {
+    jint result = (jint) oboe::Result::ErrorNull;
+    oboe::AudioStream *oboeStream = engine.getCurrentActivity()->getStream(streamIndex);
+    if (oboeStream != nullptr) {
+        result = (jint) oboeStream->getInputPreset();
+    }
+    return result;
+}
+
+JNIEXPORT jint JNICALL
 Java_com_google_sample_oboe_manualtest_OboeAudioStream_getFramesPerBurst(
         JNIEnv *env, jobject, jint streamIndex) {
     jint result = (jint) oboe::Result::ErrorNull;
@@ -354,7 +376,16 @@ Java_com_google_sample_oboe_manualtest_OboeAudioStream_getState(JNIEnv *env, job
             oboe::Result result = oboeStream->waitForStateChange(
                     oboe::StreamState::Uninitialized,
                     &state, 0);
-            if (result != oboe::Result::OK) state = oboe::StreamState::Unknown;
+
+            if (result != oboe::Result::OK){
+                if (result == oboe::Result::ErrorClosed) {
+                    state = oboe::StreamState::Closed;
+                } else if (result == oboe::Result::ErrorDisconnected){
+                    state = oboe::StreamState::Disconnected;
+                } else {
+                    state = oboe::StreamState::Unknown;
+                }
+            }
         }
         return (jint) state;
     }
@@ -422,6 +453,12 @@ JNIEXPORT void JNICALL
 Java_com_google_sample_oboe_manualtest_OboeAudioOutputStream_setSignalType(
         JNIEnv *env, jobject, jint signalType) {
     engine.getCurrentActivity()->setSignalType(signalType);
+}
+
+JNIEXPORT jint JNICALL
+Java_com_google_sample_oboe_manualtest_OboeAudioStream_getOboeVersionNumber(JNIEnv *env,
+                                                                          jclass type) {
+    return OBOE_VERSION_NUMBER;
 }
 
 // ==========================================================================
@@ -537,8 +574,17 @@ Java_com_google_sample_oboe_manualtest_GlitchActivity_getSignalToNoiseDB(JNIEnv 
 }
 JNIEXPORT jdouble JNICALL
 Java_com_google_sample_oboe_manualtest_GlitchActivity_getPeakAmplitude(JNIEnv *env,
-                                                                         jobject instance) {
+                                                                       jobject instance) {
     return engine.mActivityGlitches.getGlitchAnalyzer()->getPeakAmplitude();
+}
+
+JNIEXPORT void JNICALL
+Java_com_google_sample_oboe_manualtest_GlitchActivity_setTolerance(JNIEnv *env,
+                                                                   jobject instance,
+                                                                   jfloat tolerance) {
+    if (engine.mActivityGlitches.getGlitchAnalyzer()) {
+        engine.mActivityGlitches.getGlitchAnalyzer()->setTolerance(tolerance);
+    }
 }
 
 }

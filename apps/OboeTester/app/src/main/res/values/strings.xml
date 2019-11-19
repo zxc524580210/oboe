@@ -57,6 +57,16 @@
         <item>PCM_FLOAT</item>
     </string-array>
 
+    <string name="input_preset_prompt">InPreset:</string>
+    <string-array name="audio_input_presets">
+        <item>Generic</item>
+        <item>Camcorder</item>
+        <item>VoiceRec</item>
+        <item>VoiceComm</item>
+        <item>Unprocessed</item>
+        <item>Performance</item>
+    </string-array>
+
     <string name="channel_count_prompt">Channels:</string>
     <string-array name="channel_counts">
         <item>0</item>
@@ -73,8 +83,10 @@
 
     <string-array name="glitch_times">
         <item>10</item>
+        <item>25</item>
         <item>70</item>
-        <item>310</item>
+        <item>200</item>
+        <item>600</item>
     </string-array>
 
     <string name="performance_prompt">Perf:</string>

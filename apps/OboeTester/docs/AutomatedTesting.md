@@ -55,6 +55,8 @@ There are several optional parameters for the "glitch" test:
 
     --ei buffer_bursts      {bursts}     // number of bursts in the buffer, 2 for "double buffered"
     --ei sample_rate        {hertz}
+    --ef tolerance          {tolerance}  // amount of deviation from expected that is considered a glitch
+                                         // Range of tolerance is 0.0 to 1.0. Default is 0.1. Note use of "-ef".
     --ei duration           {seconds}    // glitch test duration, default is 10 seconds
     --ei in_channels        {samples}    // number of input channels, default is 2
     --ei out_channels       {samples}    // number of output channels, default is 2
@@ -76,11 +78,12 @@ or for a "glitch" test:
         --es test glitch \
         --es file /sdcard/glitch20190903.txt \
         --es in_perf lowlat \
-        --es out_perf none \
-        --es in_sharing shared \
-        --es out_sharing shared \
+        --es out_perf lowlat \
+        --es in_sharing exclusive \
+        --es out_sharing exclusive \
         --ei buffer_bursts 2 \
-        --ei sample_rate 44100 \
+        --ei sample_rate 48000 \
+        --ef tolerance 0.123 \
         --ei in_channels 2 \
         --ei out_channels 2 
 
@@ -126,7 +129,7 @@ Here is a report from a good test. The '#' comments were added for this document
 
     rms.signal = 0.81829  # Root Mean Square of the signal, if it can be detected
     rms.noise = 0.12645   # Root Mean Square of the background noise before the signal is detected
-    reset.count = 2       # number of times the full duplex stream input underflowed and had to resyncronize
+    reset.count = 2       # number of times the full duplex stream input underflowed and had to resynchronize
     result = 0            # 0 or a negative error
     result.text = OK      # text equivalent of the result
     latency.empty.frames = 476   # round trip latency if the top output buffer was empty
@@ -148,17 +151,18 @@ Here is a report from a test that failed because the output was muted. Note the 
 
 Here is a report from a good test. The '#' comments were added for this document and are not in the report.
 
+    tolerance = 0.123
     state = LOCKED
     unlocked.frames = 2528   # frames spent trying to lock onto the signal
     locked.frames = 384084   # frames spent locked onto a good signal with no glitches
     glitch.frames = 0        # frames spent glitching or recovering from a glitch
-    reset.count = 208        # number of times the full duplex stream input underflowed and had to resyncronize
+    reset.count = 208        # number of times the full duplex stream input underflowed and had to resynchronize
     peak.amplitude = 0.057714  # peak amplitude of the input signal, between 0.0 and 1.0
     signal.noise.ratio.db =  96.3
     time.total =     9.96 seconds  # close to your specified duration
     time.no.glitches =     9.96    # time we have been running with no glitches 
     max.time.no.glitches =     9.96 # max time with no glitches
-    glitch.count = 0               # number of glitch events, actual number may be higher is close together
+    glitch.count = 0               # number of glitch events, actual number may be higher if close together
     
 Here is a report from a test that failed because the output was muted. Note the glitch.count is missing because it could not be measured.
 

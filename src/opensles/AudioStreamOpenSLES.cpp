@@ -37,8 +37,9 @@ AudioStreamOpenSLES::AudioStreamOpenSLES(const AudioStreamBuilder &builder)
     mSessionId = SessionId::None;
 }
 
-constexpr SLuint32  kAudioChannelCountMax = 30;
-constexpr SLuint32  SL_ANDROID_UNKNOWN_CHANNELMASK  = 0; // Matches name used internally.
+static constexpr int32_t   kFramesPerHighLatencyBurst = 960; // typical, 20 msec at 48000
+static constexpr SLuint32  kAudioChannelCountMax = 30; // TODO Why 30?
+static constexpr SLuint32  SL_ANDROID_UNKNOWN_CHANNELMASK  = 0; // Matches name used internally.
 
 SLuint32 AudioStreamOpenSLES::channelCountToChannelMaskDefault(int channelCount) const {
     if (channelCount > kAudioChannelCountMax) {
@@ -69,7 +70,7 @@ SLuint32 AudioStreamOpenSLES::getDefaultByteOrder() {
 Result AudioStreamOpenSLES::open() {
 
     LOGI("AudioStreamOpenSLES::open(chans:%d, rate:%d)",
-                        mChannelCount, mSampleRate);
+         mChannelCount, mSampleRate);
 
     SLresult result = EngineOpenSLES::getInstance().open();
     if (SL_RESULT_SUCCESS != result) {
@@ -88,27 +89,38 @@ Result AudioStreamOpenSLES::open() {
         mChannelCount = DefaultStreamValues::ChannelCount;
     }
 
+    mSharingMode = SharingMode::Shared;
+
+    return Result::OK;
+}
+
+Result AudioStreamOpenSLES::configureBufferSizes() {
     // Decide frames per burst based on hints from caller.
-    // TODO  Can we query this from OpenSL ES?
-    if (mFramesPerCallback != kUnspecified) {
-        mFramesPerBurst = mFramesPerCallback;
-    } else if (mFramesPerBurst != kUnspecified) { // set from defaultFramesPerBurst
-        mFramesPerCallback = mFramesPerBurst;
-    } else {
-        mFramesPerBurst = mFramesPerCallback = DefaultStreamValues::FramesPerBurst;
+    mFramesPerBurst = mFramesPerCallback;
+    if (mFramesPerBurst == kUnspecified) {
+        mFramesPerBurst = DefaultStreamValues::FramesPerBurst;
     }
+    // For high latency streams, use a larger buffer size.
+    // Performance Mode support was added in N_MR1 (7.1)
+    if (getSdkVersion() >= __ANDROID_API_N_MR1__
+        && mPerformanceMode != PerformanceMode::LowLatency
+        && mFramesPerBurst < kFramesPerHighLatencyBurst) {
+        // Find a multiple of framesPerBurst >= kFramesPerHighLatencyBurst.
+        int32_t numBursts = (kFramesPerHighLatencyBurst + mFramesPerBurst - 1) / mFramesPerBurst;
+        mFramesPerBurst *= numBursts;
+        LOGD("AudioStreamOpenSLES:%s() NOT low latency, set mFramesPerBurst = %d",
+             __func__, mFramesPerBurst);
+    }
+    mFramesPerCallback = mFramesPerBurst;
 
     mBytesPerCallback = mFramesPerCallback * getBytesPerFrame();
-    LOGD("AudioStreamOpenSLES(): mFramesPerCallback = %d", mFramesPerCallback);
-    LOGD("AudioStreamOpenSLES(): mBytesPerCallback = %d", mBytesPerCallback);
     if (mBytesPerCallback <= 0) {
-        LOGE("AudioStreamOpenSLES::open() bytesPerCallback < 0, bad format?");
+        LOGE("AudioStreamOpenSLES::open() bytesPerCallback < 0 = %d, bad format?",
+             mBytesPerCallback);
         return Result::ErrorInvalidFormat; // causing bytesPerFrame == 0
     }
 
     mCallbackBuffer = std::make_unique<uint8_t[]>(mBytesPerCallback);
-
-    mSharingMode = SharingMode::Shared;
 
     if (!usingFIFO()) {
         mBufferCapacityInFrames = mFramesPerBurst * kBufferQueueLength;
@@ -155,6 +167,45 @@ PerformanceMode AudioStreamOpenSLES::convertPerformanceMode(SLuint32 openslMode)
     return oboeMode;
 }
 
+void AudioStreamOpenSLES::logUnsupportedAttributes() {
+    // Log unsupported attributes
+    // only report if changed from the default
+
+    // Device ID
+    if (mDeviceId != kUnspecified) {
+        LOGW("Device ID [AudioStreamBuilder::setDeviceId()] "
+             "is not supported on OpenSLES streams.");
+    }
+    // Sharing Mode
+    if (mSharingMode != SharingMode::Shared) {
+        LOGW("SharingMode [AudioStreamBuilder::setSharingMode()] "
+             "is not supported on OpenSLES streams.");
+    }
+    // Performance Mode
+    int sdkVersion = getSdkVersion();
+    if (mPerformanceMode != PerformanceMode::None && sdkVersion < __ANDROID_API_N_MR1__) {
+        LOGW("PerformanceMode [AudioStreamBuilder::setPerformanceMode()] "
+             "is not supported on OpenSLES streams running on pre-Android N-MR1 versions.");
+    }
+    // Content Type
+    if (mContentType != ContentType::Music) {
+        LOGW("ContentType [AudioStreamBuilder::setContentType()] "
+             "is not supported on OpenSLES streams.");
+    }
+
+    // Session Id
+    if (mSessionId != SessionId::None) {
+        LOGW("SessionId [AudioStreamBuilder::setSessionId()] "
+             "is not supported on OpenSLES streams.");
+    }
+
+    // Input Preset
+    if (mInputPreset != InputPreset::VoiceRecognition) {
+        LOGW("InputPreset [AudioStreamBuilder::setInputPreset()] "
+             "is not supported on OpenSLES streams.");
+    }
+}
+
 SLresult AudioStreamOpenSLES::configurePerformanceMode(SLAndroidConfigurationItf configItf) {
 
     if (configItf == nullptr) {
@@ -170,7 +221,6 @@ SLresult AudioStreamOpenSLES::configurePerformanceMode(SLAndroidConfigurationItf
 
     SLresult result = SL_RESULT_SUCCESS;
     SLuint32 performanceMode = convertPerformanceMode(getPerformanceMode());
-    LOGD("SetConfiguration(SL_ANDROID_KEY_PERFORMANCE_MODE, SL %u) called", performanceMode);
     result = (*configItf)->SetConfiguration(configItf, SL_ANDROID_KEY_PERFORMANCE_MODE,
                                                      &performanceMode, sizeof(performanceMode));
     if (SL_RESULT_SUCCESS != result) {
@@ -233,6 +283,12 @@ SLresult AudioStreamOpenSLES::enqueueCallbackBuffer(SLAndroidSimpleBufferQueueIt
     return (*bq)->Enqueue(bq, mCallbackBuffer.get(), mBytesPerCallback);
 }
 
+int32_t AudioStreamOpenSLES::getBufferDepth(SLAndroidSimpleBufferQueueItf bq) {
+    SLAndroidSimpleBufferQueueState queueState;
+    SLresult result = (*bq)->GetState(bq, &queueState);
+    return (result == SL_RESULT_SUCCESS) ? queueState.count : -1;
+}
+
 void AudioStreamOpenSLES::processBufferCallback(SLAndroidSimpleBufferQueueItf bq) {
     bool stopStream = false;
     // Ask the callback to fill the output buffer with data.
@@ -249,7 +305,7 @@ void AudioStreamOpenSLES::processBufferCallback(SLAndroidSimpleBufferQueueItf bq
         // Pass the data to OpenSLES.
         SLresult enqueueResult = enqueueCallbackBuffer(bq);
         if (enqueueResult != SL_RESULT_SUCCESS) {
-            LOGE("enqueueCallbackBuffer() returned %d", enqueueResult);
+            LOGE("%s() returned %d", __func__, enqueueResult);
             stopStream = true;
         }
     } else if (result == DataCallbackResult::Stop) {

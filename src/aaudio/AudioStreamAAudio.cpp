@@ -113,6 +113,28 @@ void AudioStreamAAudio::internalErrorCallback(
     }
 }
 
+void AudioStreamAAudio::logUnsupportedAttributes() {
+    int sdkVersion = getSdkVersion();
+
+    // These attributes are not supported pre Android "P"
+    if (sdkVersion < __ANDROID_API_P__) {
+        if (mUsage != Usage::Media) {
+            LOGW("Usage [AudioStreamBuilder::setUsage()] "
+                 "is not supported on AAudio streams running on pre-Android P versions.");
+        }
+
+        if (mContentType != ContentType::Music) {
+            LOGW("ContentType [AudioStreamBuilder::setContentType()] "
+                 "is not supported on AAudio streams running on pre-Android P versions.");
+        }
+
+        if (mSessionId != SessionId::None) {
+            LOGW("SessionId [AudioStreamBuilder::setSessionId()] "
+                 "is not supported on AAudio streams running on pre-Android P versions.");
+        }
+    }
+}
+
 Result AudioStreamAAudio::open() {
     Result result = Result::OK;
 

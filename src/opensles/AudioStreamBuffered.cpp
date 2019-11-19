@@ -24,6 +24,8 @@
 namespace oboe {
 
 constexpr int kDefaultBurstsPerBuffer = 16;  // arbitrary, allows dynamic latency tuning
+constexpr int kMinBurstsPerBuffer     = 4;  // arbitrary, allows dynamic latency tuning
+constexpr int kMinFramesPerBuffer     = 48 * 32; // arbitrary
 
 /*
  * AudioStream with a FifoBuffer
@@ -37,13 +39,24 @@ void AudioStreamBuffered::allocateFifo() {
     // callback that reads data from the FIFO.
     if (usingFIFO()) {
         // FIFO is configured with the same format and channels as the stream.
-        int32_t capacity = getBufferCapacityInFrames();
-        if (capacity == oboe::kUnspecified) {
-            capacity = getFramesPerBurst() * kDefaultBurstsPerBuffer;
-            mBufferCapacityInFrames = capacity;
+        int32_t capacityFrames = getBufferCapacityInFrames();
+        if (capacityFrames == oboe::kUnspecified) {
+            capacityFrames = getFramesPerBurst() * kDefaultBurstsPerBuffer;
+        } else {
+            int32_t minFramesPerBufferByBursts = getFramesPerBurst() * kMinBurstsPerBuffer;
+            if (capacityFrames <= minFramesPerBufferByBursts) {
+                capacityFrames = minFramesPerBufferByBursts;
+            } else {
+                capacityFrames = std::max(kMinFramesPerBuffer, capacityFrames);
+                // round up to nearest burst
+                int32_t numBursts = (capacityFrames + getFramesPerBurst() - 1)
+                        / getFramesPerBurst();
+                capacityFrames = numBursts * getFramesPerBurst();
+            }
         }
         // TODO consider using std::make_unique if we require c++14
-        mFifoBuffer.reset(new FifoBuffer(getBytesPerFrame(), capacity));
+        mFifoBuffer.reset(new FifoBuffer(getBytesPerFrame(), capacityFrames));
+        mBufferCapacityInFrames = capacityFrames;
     }
 }
 
@@ -72,6 +85,8 @@ DataCallbackResult AudioStreamBuffered::onDefaultCallback(void *audioData, int n
     }
 
     if (framesTransferred < numFrames) {
+        LOGD("AudioStreamBuffered::%s(): xrun! framesTransferred = %d, numFrames = %d",
+                __func__, framesTransferred, numFrames);
         // TODO If we do not allow FIFO to wrap then our timestamps will drift when there is an XRun!
         incrementXRunCount();
     }

@@ -23,6 +23,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.io.IOException;
+
 /**
  * Activity to measure the number of glitches.
  */
@@ -68,7 +70,7 @@ public class GlitchActivity extends AnalyzerActivity {
 
     // Periodically query for glitches from the native detector.
     protected class GlitchSniffer {
-        public static final int SNIFFER_UPDATE_PERIOD_MSEC = 50;
+        public static final int SNIFFER_UPDATE_PERIOD_MSEC = 100;
         public static final int SNIFFER_UPDATE_DELAY_MSEC = 200;
 
         private long mTimeAtStart;
@@ -187,6 +189,15 @@ public class GlitchActivity extends AnalyzerActivity {
             return message.toString();
         }
 
+        public String getShortReport() {
+            String resultText = "#glitches = " + getLastGlitchCount()
+                    + ", #resets = " + getLastResetCount()
+                    + ", max no glitch = " + getMaxSecondsWithNoGlitch() + " secs\n";
+            resultText += String.format("SNR = %5.1f db", mSignalToNoiseDB);
+            resultText += ", #locked = " + mLastLockedFrames;
+            return resultText;
+        }
+
         private void updateStatusText() {
             mLastGlitchReport = getCurrentStatusReport();
             setAnalyzerText(mLastGlitchReport);
@@ -196,8 +207,11 @@ public class GlitchActivity extends AnalyzerActivity {
             return mMaxSecondsWithoutGlitches;
         }
 
-        public int geMLastGlitchCount() {
+        public int getLastGlitchCount() {
             return mLastGlitchCount;
+        }
+        public int getLastResetCount() {
+            return mLastResetCount;
         }
     }
 
@@ -206,6 +220,13 @@ public class GlitchActivity extends AnalyzerActivity {
     private void setAnalyzerText(String s) {
         mAnalyzerTextView.setText(s);
     }
+
+    /**
+     * Set tolerance to deviations from expected value.
+     * The normalized value will be converted in the native code.
+     * @param tolerance normalized between 0.0 and 1.0
+     */
+    public native void setTolerance(float tolerance);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -243,7 +264,7 @@ public class GlitchActivity extends AnalyzerActivity {
     }
 
     // Called on UI thread
-    public void onStartAudioTest(View view) {
+    public void onStartAudioTest(View view) throws IOException {
         startAudioTest();
         mStartButton.setEnabled(false);
         mStopButton.setEnabled(true);
@@ -251,7 +272,7 @@ public class GlitchActivity extends AnalyzerActivity {
         keepScreenOn(true);
     }
 
-    public void startAudioTest() {
+    public void startAudioTest() throws IOException {
         openAudio();
         startAudio();
         mGlitchSniffer.startSniffer();
@@ -295,8 +316,8 @@ public class GlitchActivity extends AnalyzerActivity {
         return mGlitchSniffer.getMaxSecondsWithNoGlitch();
     }
 
-    public int getLastGlitchCount() {
-        return mGlitchSniffer.geMLastGlitchCount();
+    public String getShortReport() {
+        return mGlitchSniffer.getShortReport();
     }
 
     @Override

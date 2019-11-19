@@ -123,19 +123,32 @@ public class AnalyzerActivity extends TestInputActivity {
         }
     }
 
+    @Override
+    protected void resetConfiguration() {
+        super.resetConfiguration();
+        mAudioOutTester.reset();
+
+        StreamContext streamContext = getFirstInputStreamContext();
+        if (streamContext != null) {
+            if (streamContext.configurationView != null) {
+                streamContext.configurationView.setFormat(StreamConfiguration.AUDIO_FORMAT_PCM_FLOAT);
+                streamContext.configurationView.setFormatConversionAllowed(true);
+            }
+        }
+        streamContext = getFirstOutputStreamContext();
+        if (streamContext != null) {
+            if (streamContext.configurationView != null) {
+                streamContext.configurationView.setFormat(StreamConfiguration.AUDIO_FORMAT_PCM_FLOAT);
+                streamContext.configurationView.setFormatConversionAllowed(true);
+            }
+        }
+    }
+
     public void startAudio() {
         if (mBufferSizeView != null && mBufferSizeView.isEnabled()) {
             mBufferSizeView.updateBufferSize();
-            mBufferSizeView.setEnabled(false);
         }
         super.startAudio();
-    }
-
-    public void stopAudio() {
-        if (mBufferSizeView != null) {
-            mBufferSizeView.setEnabled(true);
-        }
-        super.stopAudio();
     }
 
     public void onStreamClosed() {

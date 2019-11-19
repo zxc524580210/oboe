@@ -42,7 +42,7 @@ import java.util.Date;
 abstract class TestAudioActivity extends Activity {
     public static final String TAG = "TestOboe";
 
-    protected static final int FADER_THRESHOLD_MAX = 1000;
+    protected static final int FADER_PROGRESS_MAX = 1000;
     public static final int STATE_OPEN = 0;
     public static final int STATE_STARTED = 1;
     public static final int STATE_PAUSED = 2;
@@ -157,6 +157,15 @@ abstract class TestAudioActivity extends Activity {
                 streamContext.configurationView.hideSettingsView();
             }
         }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        resetConfiguration();
+    }
+
+    protected void resetConfiguration() {
     }
 
     @Override
@@ -321,7 +330,11 @@ abstract class TestAudioActivity extends Activity {
     }
 
     public void openAudio(View view) {
-        openAudio();
+        try {
+            openAudio();
+        } catch (Exception e) {
+            showErrorToast(e.getMessage());
+        }
     }
 
     public void startAudio(View view) {
@@ -356,35 +369,33 @@ abstract class TestAudioActivity extends Activity {
         return mSampleRate;
     }
     
-    public void openAudio() {
+    public void openAudio() throws IOException {
+        closeAudio();
+
         int sampleRate = 0;
-        try {
-            // Open output streams then open input streams.
-            // This is so that the capacity of input stream can be expanded to
-            // match the burst size of the output for full duplex.
-            for (StreamContext streamContext : mStreamContexts) {
-                if (!streamContext.isInput()) {
-                    openStreamContext(streamContext);
-                    int streamSampleRate = streamContext.tester.actualConfiguration.getSampleRate();
-                    if (sampleRate == 0) {
-                        sampleRate = streamSampleRate;
-                    }
+
+        // Open output streams then open input streams.
+        // This is so that the capacity of input stream can be expanded to
+        // match the burst size of the output for full duplex.
+        for (StreamContext streamContext : mStreamContexts) {
+            if (!streamContext.isInput()) {
+                openStreamContext(streamContext);
+                int streamSampleRate = streamContext.tester.actualConfiguration.getSampleRate();
+                if (sampleRate == 0) {
+                    sampleRate = streamSampleRate;
                 }
             }
-            for (StreamContext streamContext : mStreamContexts) {
-                if (streamContext.isInput()) {
-                    if (sampleRate != 0) {
-                        streamContext.tester.requestedConfiguration.setSampleRate(sampleRate);
-                    }
-                    openStreamContext(streamContext);
-                }
-            }
-            updateEnabledWidgets();
-            mStreamSniffer.startStreamSniffer();
-        } catch (Exception e) {
-            e.printStackTrace();
-            showErrorToast(e.getMessage());
         }
+        for (StreamContext streamContext : mStreamContexts) {
+            if (streamContext.isInput()) {
+                if (sampleRate != 0) {
+                    streamContext.tester.requestedConfiguration.setSampleRate(sampleRate);
+                }
+                openStreamContext(streamContext);
+            }
+        }
+        updateEnabledWidgets();
+        mStreamSniffer.startStreamSniffer();
     }
 
     private void openStreamContext(StreamContext streamContext) throws IOException {

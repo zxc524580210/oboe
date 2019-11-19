@@ -62,12 +62,14 @@ abstract class OboeAudioStream extends AudioStreamBase {
                 requestedConfiguration.getFormat(),
                 requestedConfiguration.getSharingMode(),
                 requestedConfiguration.getPerformanceMode(),
+                requestedConfiguration.getInputPreset(),
                 requestedConfiguration.getDeviceId(),
                 requestedConfiguration.getSessionId(),
                 requestedConfiguration.getFramesPerBurst(),
                 requestedConfiguration.getChannelConversionAllowed(),
                 requestedConfiguration.getFormatConversionAllowed(),
                 requestedConfiguration.getRateConversionQuality(),
+                requestedConfiguration.isMMap(),
                 isInput()
         );
         if (result < 0) {
@@ -80,6 +82,7 @@ abstract class OboeAudioStream extends AudioStreamBase {
         actualConfiguration.setSampleRate(getSampleRate());
         actualConfiguration.setSharingMode(getSharingMode());
         actualConfiguration.setPerformanceMode(getPerformanceMode());
+        actualConfiguration.setInputPreset(getInputPreset());
         actualConfiguration.setFramesPerBurst(getFramesPerBurst());
         actualConfiguration.setBufferCapacityInFrames(getBufferCapacityInFrames());
         actualConfiguration.setChannelCount(getChannelCount());
@@ -99,12 +102,14 @@ abstract class OboeAudioStream extends AudioStreamBase {
             int format,
             int sharingMode,
             int performanceMode,
+            int inputPreset,
             int deviceId,
             int sessionId,
             int framesPerRead,
             boolean channelConversionAllowed,
             boolean formatConversionAllowed,
             int rateConversionQuality,
+            boolean isMMap,
             boolean isInput);
 
     @Override
@@ -159,6 +164,11 @@ abstract class OboeAudioStream extends AudioStreamBase {
         return getPerformanceMode(streamIndex);
     }
     public native int getPerformanceMode(int streamIndex);
+
+    public int getInputPreset() {
+        return getInputPreset(streamIndex);
+    }
+    public native int getInputPreset(int streamIndex);
 
     public int getSampleRate() {
         return getSampleRate(streamIndex);
@@ -231,4 +241,6 @@ abstract class OboeAudioStream extends AudioStreamBase {
     public static native void setUseCallback(boolean checked);
 
     public static native void setCallbackSize(int callbackSize);
+
+    public static native int getOboeVersionNumber();
 }

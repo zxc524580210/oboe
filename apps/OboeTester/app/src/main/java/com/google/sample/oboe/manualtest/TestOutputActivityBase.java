@@ -22,7 +22,7 @@ import android.util.Log;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import com.google.sample.oboe.manualtest.R;
+import java.io.IOException;
 
 
 abstract class TestOutputActivityBase extends TestAudioActivity {
@@ -39,7 +39,7 @@ abstract class TestOutputActivityBase extends TestAudioActivity {
         @Override
         public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
             double amplitude = mTaperAmplitude.linearToExponential(
-                    ((double)progress)/FADER_THRESHOLD_MAX);
+                    ((double)progress) / FADER_PROGRESS_MAX);
             mAudioOutTester.setAmplitude(amplitude);
             mTextAmplitude.setText("Amplitude = " + amplitude);
         }
@@ -52,6 +52,12 @@ abstract class TestOutputActivityBase extends TestAudioActivity {
         public void onStopTrackingTouch(SeekBar seekBar) {
         }
     };
+
+    @Override
+    protected void resetConfiguration() {
+        super.resetConfiguration();
+        mAudioOutTester.reset();
+    }
 
     protected void findAudioCommon() {
         super.findAudioCommon();
@@ -70,12 +76,13 @@ abstract class TestOutputActivityBase extends TestAudioActivity {
         return audioOutTester;
     }
 
-    public void pauseAudio() {
-        super.pauseAudio();
-    }
 
-    public void stopAudio() {
-        super.stopAudio();
+    @Override
+    public void openAudio() throws IOException {
+        super.openAudio();
+        if (mBufferSizeView != null) {
+            mBufferSizeView.updateBufferSize();
+        }
     }
 
     // TODO Add editor

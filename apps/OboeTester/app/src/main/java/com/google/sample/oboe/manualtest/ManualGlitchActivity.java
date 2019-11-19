@@ -17,12 +17,13 @@
 package com.google.sample.oboe.manualtest;
 
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.widget.SeekBar;
+import android.widget.TextView;
 
-import java.util.Date;
+import java.io.IOException;
 
 public class ManualGlitchActivity extends GlitchActivity {
 
@@ -50,13 +51,55 @@ public class ManualGlitchActivity extends GlitchActivity {
     public static final String KEY_BUFFER_BURSTS = "buffer_bursts";
     public static final int VALUE_DEFAULT_BUFFER_BURSTS = 2;
 
+    public static final String KEY_TOLERANCE = "tolerance";
+    private static final float DEFAULT_TOLERANCE = 0.1f;
+
+    private TextView mTextTolerance;
+    private SeekBar mFaderTolerance;
+    protected ExponentialTaper mTaperTolerance;
     private boolean mTestRunningByIntent;
     private Bundle mBundleFromIntent;
+
+    private float   mTolerance = DEFAULT_TOLERANCE;
+
+    private SeekBar.OnSeekBarChangeListener mToleranceListener = new SeekBar.OnSeekBarChangeListener() {
+        @Override
+        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+            setToleranceProgress(progress);
+        }
+
+        @Override
+        public void onStartTrackingTouch(SeekBar seekBar) {
+        }
+
+        @Override
+        public void onStopTrackingTouch(SeekBar seekBar) {
+        }
+    };
+
+    protected void setToleranceProgress(int progress) {
+        float tolerance = (float) mTaperTolerance.linearToExponential(
+                ((double)progress) / FADER_PROGRESS_MAX);
+        setTolerance(tolerance);
+        mTextTolerance.setText("Tolerance = " + String.format("%5.3f", tolerance));
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mBundleFromIntent = getIntent().getExtras();
+
+        mTextTolerance = (TextView) findViewById(R.id.textTolerance);
+        mFaderTolerance = (SeekBar) findViewById(R.id.faderTolerance);
+        mTaperTolerance = new ExponentialTaper(0.0, 0.5, 100.0);
+        mFaderTolerance.setOnSeekBarChangeListener(mToleranceListener);
+        setToleranceFader(DEFAULT_TOLERANCE);
+    }
+
+    private void setToleranceFader(float tolerance) {
+        int progress = (int) Math.round((mTaperTolerance.exponentialToLinear(
+                tolerance) * FADER_PROGRESS_MAX));
+        mFaderTolerance.setProgress(progress);
     }
 
     @Override
@@ -109,6 +152,7 @@ public class ManualGlitchActivity extends GlitchActivity {
             return StreamConfiguration.PERFORMANCE_MODE_LOW_LATENCY;
         }
     }
+
     private int getSharingFromText(String text) {
         if (VALUE_SHARING_SHARED.equals(text)) {
             return StreamConfiguration.SHARING_MODE_SHARED;
@@ -146,10 +190,20 @@ public class ManualGlitchActivity extends GlitchActivity {
         requestedInConfig.setSampleRate(sampleRate);
         requestedOutConfig.setSampleRate(sampleRate);
 
+        float tolerance = bundle.getFloat(KEY_TOLERANCE, DEFAULT_TOLERANCE);
+        setToleranceFader(tolerance);
+        setTolerance(tolerance);
+        mTolerance = tolerance;
+
         int inChannels = bundle.getInt(KEY_IN_CHANNELS, VALUE_DEFAULT_CHANNELS);
         requestedInConfig.setChannelCount(inChannels);
         int outChannels = bundle.getInt(KEY_OUT_CHANNELS, VALUE_DEFAULT_CHANNELS);
         requestedOutConfig.setChannelCount(outChannels);
+    }
+
+    public void startAudioTest() throws IOException {
+        super.startAudioTest();
+        setToleranceProgress(mFaderTolerance.getProgress());
     }
 
     void startAutomaticTest() {
@@ -159,23 +213,31 @@ public class ManualGlitchActivity extends GlitchActivity {
         int numBursts = mBundleFromIntent.getInt(KEY_BUFFER_BURSTS, VALUE_DEFAULT_BUFFER_BURSTS);
         mBundleFromIntent = null;
 
-        onStartAudioTest(null);
+        try {
+            onStartAudioTest(null);
+            int sizeFrames = mAudioOutTester.getCurrentAudioStream().getFramesPerBurst() * numBursts;
+            mAudioOutTester.getCurrentAudioStream().setBufferSizeInFrames(sizeFrames);
 
-        int sizeFrames = mAudioOutTester.getCurrentAudioStream().getFramesPerBurst() * numBursts;
-        mAudioOutTester.getCurrentAudioStream().setBufferSizeInFrames(sizeFrames);
+            // Schedule the end of the test.
+            Handler handler = new Handler(Looper.getMainLooper()); // UI thread
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    stopAutomaticTest();
+                }
+            }, durationSeconds * 1000);
+        } catch (IOException e) {
+            String report = "Open failed: " + e.getMessage();
+            maybeWriteTestResult(report);
+            mTestRunningByIntent = false;
+        }
 
-        // Schedule the end of the test.
-        Handler handler = new Handler(Looper.getMainLooper()); // UI thread
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                stopAutomaticTest();
-            }
-        }, durationSeconds * 1000);
     }
 
     void stopAutomaticTest() {
-        String report = getCommonTestReport() + mLastGlitchReport;
+        String report = getCommonTestReport()
+                + String.format("tolerance = %5.3f\n", mTolerance)
+                + mLastGlitchReport;
         onStopAudioTest(null);
         maybeWriteTestResult(report);
         mTestRunningByIntent = false;

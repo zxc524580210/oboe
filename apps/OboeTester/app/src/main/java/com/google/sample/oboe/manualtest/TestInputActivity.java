@@ -36,6 +36,7 @@ import android.widget.Toast;
 import com.google.sample.oboe.manualtest.R;
 
 import java.io.File;
+import java.io.IOException;
 
 /**
  * Test Oboe Capture
@@ -59,6 +60,9 @@ public class TestInputActivity  extends TestAudioActivity
     @Override
     protected void inflateActivity() {
         setContentView(R.layout.activity_test_input);
+
+        BufferSizeView bufferSizeView = findViewById(R.id.buffer_size_view);
+        bufferSizeView.setVisibility(View.GONE);
     }
 
     @Override
@@ -75,12 +79,19 @@ public class TestInputActivity  extends TestAudioActivity
         updateEnabledWidgets();
 
         mAudioInputTester = addAudioInputTester();
+
     }
 
     @Override
     protected void onStart() {
         super.onStart();
         setActivityType(ACTIVITY_TEST_INPUT);
+    }
+
+    @Override
+    protected void resetConfiguration() {
+        super.resetConfiguration();
+        mAudioInputTester.reset();
     }
 
     @Override
@@ -96,6 +107,13 @@ public class TestInputActivity  extends TestAudioActivity
         }
     }
 
+    void resetVolumeBars() {
+        for (int i = 0; i < mVolumeBars.length; i++) {
+            if (mVolumeBars[i] == null) break;
+            mVolumeBars[i].setVolume((float) 0.0);
+        }
+    }
+
     void setMinimumBurstsBeforeRead(int numBursts) {
         int framesPerBurst = mAudioInputTester.getCurrentAudioStream().getFramesPerBurst();
         if (framesPerBurst > 0) {
@@ -104,13 +122,20 @@ public class TestInputActivity  extends TestAudioActivity
     }
 
     @Override
-    public void openAudio() {
+    public void openAudio() throws IOException {
         if (!isRecordPermissionGranted()){
             requestRecordPermission();
             return;
         }
         super.openAudio();
         setMinimumBurstsBeforeRead(mInputMarginBursts);
+        resetVolumeBars();
+    }
+
+    @Override
+    public void stopAudio() {
+        super.stopAudio();
+        resetVolumeBars();
     }
 
     private boolean isRecordPermissionGranted() {
@@ -143,7 +168,11 @@ public class TestInputActivity  extends TestAudioActivity
                     .show();
         } else {
             // Permission was granted
-            super.openAudio();
+            try {
+                super.openAudio();
+            } catch (IOException e) {
+                showErrorToast(e.getMessage());
+            }
         }
     }
 
